@@ -4,11 +4,13 @@ import { Sidebar } from "@/components/Sidebar";
 import { Topbar } from "@/components/Topbar";
 import { useUIStore } from "@/store/ui.store";
 import { useERPAuth } from "@/store/erp.auth.store";
+import { useT } from "@/i18n/useT";
 import { cn } from "@/utils/utils";
 
 export default function MainLayout() {
   const { sidebarOpen, theme } = useUIStore();
   const { isAuthenticated } = useERPAuth();
+  const t = useT();
 
   useEffect(() => {
     const root = document.documentElement;
@@ -16,10 +18,7 @@ export default function MainLayout() {
     else root.classList.remove("dark");
   }, [theme]);
 
-  // Redirigir al login si no esta autenticado
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   return (
     <div className={cn("min-h-screen flex", theme === "dark" ? "bg-slate-950" : "bg-slate-50")}>
@@ -33,10 +32,10 @@ export default function MainLayout() {
         </main>
         <footer className={cn("h-16 border-t px-8 flex items-center justify-between text-xs font-semibold uppercase tracking-widest",
           theme === "dark" ? "bg-slate-900 border-slate-800 text-slate-500" : "bg-white border-slate-100 text-slate-400")}>
-          <p>© 2026 GEA SERVICES ERP · v2.0.0</p>
+          <p>{t.footerCopyright}</p>
           <div className="flex gap-8">
-            <a href="#" className="hover:text-blue-500 transition-all">Soporte Tecnico</a>
-            <a href="#" className="hover:text-blue-500 transition-all">Documentacion API</a>
+            <a href="#" className="hover:text-blue-500 transition-all">{t.soporteTecnico}</a>
+            <a href="#" className="hover:text-blue-500 transition-all">{t.documentacionAPI}</a>
           </div>
         </footer>
       </div>

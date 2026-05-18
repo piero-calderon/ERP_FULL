@@ -1,56 +1,13 @@
-﻿// GEA SERVICES ERP - Menu principal con filtro por rol
-import React from "react";
+﻿// GEA SERVICES ERP - Menu principal con traducciones
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/utils/utils";
 import { useERPAuth, type ERPRole } from "@/store/erp.auth.store";
+import { useT } from "@/i18n/useT";
 import {
   LayoutDashboard, Target, TrendingUp, Warehouse, Truck,
   ShoppingBag, Star, DollarSign, FileText, BarChart3,
   Bell, Puzzle, Shield, Settings, Globe
 } from "lucide-react";
-
-// Todas las areas con sus roles permitidos
-const TODAS_LAS_AREAS = [
-  {
-    nombre: "Area Comercial", color: "blue",
-    roles: ["admin", "comercial"] as ERPRole[],
-    modulos: [
-      { icono: LayoutDashboard, label: "Dashboard", path: "/dashboard",    desc: "Panel ejecutivo" },
-      { icono: Target,          label: "CRM",       path: "/crm",          desc: "Pipeline comercial" },
-      { icono: TrendingUp,      label: "Ventas",    path: "/ventas",       desc: "Cotizaciones y pedidos" },
-    ],
-  },
-  {
-    nombre: "Area Operativa", color: "emerald",
-    roles: ["admin", "operativa"] as ERPRole[],
-    modulos: [
-      { icono: Warehouse,   label: "Inventario", path: "/inventario", desc: "Stock y almacen WMS" },
-      { icono: ShoppingBag, label: "Compras",    path: "/compras",    desc: "Proveedores y OC" },
-      { icono: Truck,       label: "Logistica",  path: "/logistica",  desc: "Rutas y entregas TMS" },
-    ],
-  },
-  {
-    nombre: "Gestion Empresarial", color: "violet",
-    roles: ["admin", "empresarial"] as ERPRole[],
-    modulos: [
-      { icono: Star,      label: "Calidad",        path: "/calidad",        desc: "NPS y reclamos" },
-      { icono: DollarSign,label: "Finanzas",       path: "/finanzas",       desc: "Cobros y tesoreria" },
-      { icono: FileText,  label: "Documentos",     path: "/documentos",     desc: "Repositorio docs" },
-      { icono: BarChart3, label: "Reportes",       path: "/reportes",       desc: "Analisis y exportes" },
-      { icono: Bell,      label: "Notificaciones", path: "/notificaciones", desc: "Alertas del sistema" },
-    ],
-  },
-  {
-    nombre: "Administracion", color: "slate",
-    roles: ["admin", "administracion"] as ERPRole[],
-    modulos: [
-      { icono: Settings, label: "Configuracion",  path: "/configuracion",  desc: "Parametros del sistema" },
-      { icono: Shield,   label: "Auditoria",      path: "/auditoria",      desc: "Trazabilidad" },
-      { icono: Puzzle,   label: "Integraciones",  path: "/integraciones",  desc: "API y conectores" },
-      { icono: Globe,    label: "Portal Cliente", path: "/portal/login",   desc: "Autoservicio cliente" },
-    ],
-  },
-];
 
 const colors: Record<string, { bar: string; icon: string; bg: string; darkBg: string; text: string; hover: string }> = {
   blue:    { bar: "bg-blue-600",    icon: "text-blue-500",    bg: "bg-blue-50",    darkBg: "dark:bg-blue-900/30",    text: "text-blue-600 dark:text-blue-400",    hover: "hover:border-blue-300 dark:hover:border-blue-700" },
@@ -62,39 +19,78 @@ const colors: Record<string, { bar: string; icon: string; bg: string; darkBg: st
 export default function HomePage() {
   const navigate = useNavigate();
   const { usuario } = useERPAuth();
-  const fecha = new Date().toLocaleDateString("es-ES", {
-    weekday: "long", day: "numeric", month: "long", year: "numeric"
-  });
+  const t = useT();
 
-  // Filtrar areas segun rol del usuario
+  const fecha = new Date().toLocaleDateString(
+    useLangFromStore(),
+    { weekday: "long", day: "numeric", month: "long", year: "numeric" }
+  );
+
+  const TODAS_LAS_AREAS = [
+    {
+      nombre: t.areaComercial, color: "blue",
+      roles: ["admin", "comercial"] as ERPRole[],
+      modulos: [
+        { icono: LayoutDashboard, label: t.dashboard, path: "/dashboard",    desc: t.descDashboard },
+        { icono: Target,          label: t.crm,       path: "/crm",          desc: t.descCRM },
+        { icono: TrendingUp,      label: t.ventas,    path: "/ventas",       desc: t.descVentas },
+      ],
+    },
+    {
+      nombre: t.areaOperativa, color: "emerald",
+      roles: ["admin", "operativa"] as ERPRole[],
+      modulos: [
+        { icono: Warehouse,   label: t.inventario, path: "/inventario", desc: t.descInventario },
+        { icono: ShoppingBag, label: t.compras,    path: "/compras",    desc: t.descCompras },
+        { icono: Truck,       label: t.logistica,  path: "/logistica",  desc: t.descLogistica },
+      ],
+    },
+    {
+      nombre: t.areaEmpresarial, color: "violet",
+      roles: ["admin", "empresarial"] as ERPRole[],
+      modulos: [
+        { icono: Star,      label: t.calidad,        path: "/calidad",        desc: t.descCalidad },
+        { icono: DollarSign,label: t.finanzas,       path: "/finanzas",       desc: t.descFinanzas },
+        { icono: FileText,  label: t.documentos,     path: "/documentos",     desc: t.descDocumentos },
+        { icono: BarChart3, label: t.reportes,       path: "/reportes",       desc: t.descReportes },
+        { icono: Bell,      label: t.notificaciones, path: "/notificaciones", desc: t.descNotificaciones },
+      ],
+    },
+    {
+      nombre: t.areaAdministracion, color: "slate",
+      roles: ["admin", "administracion"] as ERPRole[],
+      modulos: [
+        { icono: Settings, label: t.configuracion,  path: "/configuracion",  desc: t.descConfiguracion },
+        { icono: Shield,   label: t.auditoria,      path: "/auditoria",      desc: t.descAuditoria },
+        { icono: Puzzle,   label: t.integraciones,  path: "/integraciones",  desc: t.descIntegraciones },
+        { icono: Globe,    label: t.portalCliente,  path: "/portal/login",   desc: t.descPortalCliente },
+      ],
+    },
+  ];
+
   const areasVisibles = usuario
     ? TODAS_LAS_AREAS.filter(area => area.roles.includes(usuario.rol))
     : TODAS_LAS_AREAS;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Panel Principal
-          </h1>
+          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">{t.panelPrincipal}</h1>
           <p className="text-slate-400 mt-1 text-sm capitalize">{fecha}</p>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700 rounded-xl">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">Sistema operativo</span>
+          <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">{t.sistemaOperativo}</span>
         </div>
       </div>
 
-      {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: "Ventas del mes",     valor: "84.320 EUR", sub: "+12.4% vs mes anterior" },
-          { label: "Productos en stock", valor: "1.248",      sub: "+30 esta semana" },
-          { label: "Pedidos activos",    valor: "57",         sub: "3 pendientes despachar" },
-          { label: "Stock critico",      valor: "8",          sub: "3 productos criticos" },
+          { label: t.ventasMes,      valor: "84.320 EUR", sub: t.ventasMesSub },
+          { label: t.productosStock, valor: "1.248",      sub: t.productosStockSub },
+          { label: t.pedidosActivos, valor: "57",         sub: `3 ${t.pendientesDespachar}` },
+          { label: t.stockCritico,   valor: "8",          sub: `3 ${t.productosStockSubText}` },
         ].map(k => (
           <div key={k.label} className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm px-5 py-4">
             <p className="text-xs text-slate-400 mb-1">{k.label}</p>
@@ -104,7 +100,6 @@ export default function HomePage() {
         ))}
       </div>
 
-      {/* Solo las areas del usuario */}
       {areasVisibles.map((area) => {
         const c = colors[area.color];
         return (
@@ -119,8 +114,7 @@ export default function HomePage() {
                 <button key={mod.label} onClick={() => navigate(mod.path)}
                   className={cn(
                     "relative flex flex-col items-center gap-3 p-5 rounded-2xl border text-center transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 cursor-pointer",
-                    "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700",
-                    c.hover
+                    "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700", c.hover
                   )}>
                   <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center", c.bg, c.darkBg)}>
                     <mod.icono className={cn("w-6 h-6", c.icon)} />
@@ -130,7 +124,7 @@ export default function HomePage() {
                     <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{mod.desc}</p>
                   </div>
                   <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400">
-                    Activo
+                    {t.activo}
                   </span>
                 </button>
               ))}
@@ -146,4 +140,16 @@ export default function HomePage() {
       </div>
     </div>
   );
+}
+
+// Helper para obtener el locale correcto
+function useLangFromStore() {
+  try {
+    const stored = localStorage.getItem("erp-lang");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return parsed.state?.lang === "it" ? "it-IT" : "es-ES";
+    }
+  } catch { /* */ }
+  return "es-ES";
 }

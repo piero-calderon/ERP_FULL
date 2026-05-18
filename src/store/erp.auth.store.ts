@@ -1,6 +1,7 @@
-﻿// Store de autenticacion interna del ERP GEA SERVICES
+﻿// Store de autenticacion ERP con Supabase
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { supabase } from "@/lib/supabase";
 
 export type ERPRole = "admin" | "comercial" | "operativa" | "empresarial" | "administracion";
 
@@ -13,43 +14,14 @@ export interface ERPUser {
   avatar: string;
 }
 
-// Usuarios del sistema
-const USUARIOS: (ERPUser & { password: string })[] = [
-  {
-    id: "1", nombre: "Admin General", email: "admin@geaservices.com",
-    password: "admin123", rol: "admin", area: "Administracion General",
-    avatar: "AG",
-  },
-  {
-    id: "2", nombre: "Carlos Gomez", email: "comercial@geaservices.com",
-    password: "comercial123", rol: "comercial", area: "Area Comercial",
-    avatar: "CG",
-  },
-  {
-    id: "3", nombre: "Ana Torres", email: "operativa@geaservices.com",
-    password: "operativa123", rol: "operativa", area: "Area Operativa",
-    avatar: "AT",
-  },
-  {
-    id: "4", nombre: "Pedro Vega", email: "empresarial@geaservices.com",
-    password: "empresarial123", rol: "empresarial", area: "Gestion Empresarial",
-    avatar: "PV",
-  },
-  {
-    id: "5", nombre: "Maria Lopez", email: "admin.sys@geaservices.com",
-    password: "admin123", rol: "administracion", area: "Administracion",
-    avatar: "ML",
-  },
+// Usuarios demo hardcodeados como fallback
+const USUARIOS_DEMO: (ERPUser & { password: string })[] = [
+  { id: "1", nombre: "Admin General",  email: "admin@geaservices.com",       password: "admin123",       rol: "admin",          area: "Administracion General", avatar: "AG" },
+  { id: "2", nombre: "Carlos Gomez",   email: "comercial@geaservices.com",   password: "comercial123",   rol: "comercial",      area: "Area Comercial",         avatar: "CG" },
+  { id: "3", nombre: "Ana Torres",     email: "operativa@geaservices.com",   password: "operativa123",   rol: "operativa",      area: "Area Operativa",         avatar: "AT" },
+  { id: "4", nombre: "Pedro Vega",     email: "empresarial@geaservices.com", password: "empresarial123", rol: "empresarial",    area: "Gestion Empresarial",    avatar: "PV" },
+  { id: "5", nombre: "Maria Lopez",    email: "admin.sys@geaservices.com",   password: "admin123",       rol: "administracion", area: "Administracion",         avatar: "ML" },
 ];
-
-// Rutas permitidas por rol
-export const RUTAS_POR_ROL: Record<ERPRole, string[]> = {
-  admin: ["*"], // acceso total
-  comercial: ["/", "/dashboard", "/crm", "/ventas"],
-  operativa: ["/", "/dashboard", "/inventario", "/logistica", "/compras"],
-  empresarial: ["/", "/dashboard", "/calidad", "/finanzas", "/documentos", "/reportes", "/notificaciones"],
-  administracion: ["/", "/dashboard", "/configuracion", "/auditoria", "/integraciones", "/portal-clientes"],
-};
 
 interface ERPAuthState {
   usuario: ERPUser | null;
@@ -60,7 +32,16 @@ interface ERPAuthState {
   logout: () => void;
   clearError: () => void;
   tieneAcceso: (ruta: string) => boolean;
+  initAuth: () => Promise<void>;
 }
+
+export const RUTAS_POR_ROL: Record<ERPRole, string[]> = {
+  admin:          ["*"],
+  comercial:      ["/", "/dashboard", "/crm", "/ventas"],
+  operativa:      ["/", "/dashboard", "/inventario", "/logistica", "/compras"],
+  empresarial:    ["/", "/dashboard", "/calidad", "/finanzas", "/documentos", "/reportes", "/notificaciones"],
+  administracion: ["/", "/dashboard", "/configuracion", "/auditoria", "/integraciones", "/portal-clientes"],
+};
 
 export const useERPAuth = create<ERPAuthState>()(
   persist(
@@ -70,19 +51,93 @@ export const useERPAuth = create<ERPAuthState>()(
       error: null,
       isAuthenticated: false,
 
-      login: async (email, password) => {
-        set({ loading: true, error: null });
-        await new Promise(r => setTimeout(r, 800));
-        const found = USUARIOS.find(u => u.email === email && u.password === password);
-        if (!found) {
-          set({ loading: false, error: "Email o contraseña incorrectos" });
-          return;
+      initAuth: async () => {
+        // Verificar sesion activa en Supabase
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          // Buscar perfil en tabla erp_usuarios
+          const { data: perfil } = await supabase
+            .from("erp_usuarios")
+            .select("*")
+            .eq("user_id", session.user.id)
+            .single();
+
+          if (perfil) {
+            set({
+              usuario: {
+                id: perfil.user_id,
+                nombre: perfil.nombre,
+                email: session.user.email ?? "",
+                rol: perfil.rol as ERPRole,
+                area: perfil.area,
+                avatar: perfil.avatar,
+              },
+              isAuthenticated: true,
+            });
+          }
         }
-        const { password: _, ...usuario } = found;
-        set({ usuario, isAuthenticated: true, loading: false, error: null });
       },
 
-      logout: () => set({ usuario: null, isAuthenticated: false, error: null }),
+      login: async (email, password) => {
+        set({ loading: true, error: null });
+
+        try {
+          // Intentar login con Supabase primero
+          const { data, error: sbError } = await supabase.auth.signInWithPassword({ email, password });
+
+          if (!sbError && data.user) {
+            // Buscar perfil en tabla erp_usuarios
+            const { data: perfil } = await supabase
+              .from("erp_usuarios")
+              .select("*")
+              .eq("user_id", data.user.id)
+              .single();
+
+            if (perfil) {
+              set({
+                usuario: {
+                  id: perfil.user_id,
+                  nombre: perfil.nombre,
+                  email: data.user.email ?? "",
+                  rol: perfil.rol as ERPRole,
+                  area: perfil.area,
+                  avatar: perfil.avatar,
+                },
+                isAuthenticated: true,
+                loading: false,
+                error: null,
+              });
+              return;
+            }
+          }
+
+          // Fallback a usuarios demo
+          await new Promise(r => setTimeout(r, 600));
+          const found = USUARIOS_DEMO.find(u => u.email === email && u.password === password);
+          if (!found) {
+            set({ loading: false, error: "Email o contrasena incorrectos" });
+            return;
+          }
+          const { password: _, ...usuario } = found;
+          set({ usuario, isAuthenticated: true, loading: false, error: null });
+
+        } catch {
+          // Fallback total a demo
+          await new Promise(r => setTimeout(r, 600));
+          const found = USUARIOS_DEMO.find(u => u.email === email && u.password === password);
+          if (!found) {
+            set({ loading: false, error: "Email o contrasena incorrectos" });
+            return;
+          }
+          const { password: _, ...usuario } = found;
+          set({ usuario, isAuthenticated: true, loading: false, error: null });
+        }
+      },
+
+      logout: async () => {
+        await supabase.auth.signOut();
+        set({ usuario: null, isAuthenticated: false, error: null });
+      },
 
       clearError: () => set({ error: null }),
 

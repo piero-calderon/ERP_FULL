@@ -1,68 +1,68 @@
-﻿// Sidebar GEA SERVICES ERP - areas por rol, sin bloque usuario lateral
+﻿// Sidebar GEA SERVICES ERP - con traducciones
 import { NavLink } from "react-router-dom";
 import { ChevronLeft, Menu, LayoutDashboard, Target, TrendingUp, Warehouse, Truck, ShoppingBag, Star, DollarSign, FolderOpen, BarChart3, Bell, Settings, Store, Plug, ShieldCheck, LogOut } from "lucide-react";
 import { cn } from "@/utils/utils";
 import { useUIStore } from "@/store/ui.store";
 import { useERPAuth, type ERPRole } from "@/store/erp.auth.store";
-
-const TODAS_LAS_AREAS = [
-  {
-    label: "Comercial", color: "text-blue-500", bar: "bg-blue-500",
-    roles: ["admin", "comercial"] as ERPRole[],
-    items: [
-      { icon: LayoutDashboard, label: "Dashboard", path: "/",         exact: true },
-      { icon: Target,          label: "CRM",       path: "/crm" },
-      { icon: TrendingUp,      label: "Ventas",    path: "/ventas" },
-    ],
-  },
-  {
-    label: "Operativa", color: "text-emerald-500", bar: "bg-emerald-500",
-    roles: ["admin", "operativa"] as ERPRole[],
-    items: [
-      { icon: Warehouse,   label: "Inventario", path: "/inventario" },
-      { icon: Truck,       label: "Logistica",  path: "/logistica" },
-      { icon: ShoppingBag, label: "Compras",    path: "/compras" },
-    ],
-  },
-  {
-    label: "Empresarial", color: "text-violet-500", bar: "bg-violet-500",
-    roles: ["admin", "empresarial"] as ERPRole[],
-    items: [
-      { icon: Star,       label: "Calidad",        path: "/calidad" },
-      { icon: DollarSign, label: "Finanzas",       path: "/finanzas" },
-      { icon: FolderOpen, label: "Documentos",     path: "/documentos" },
-      { icon: BarChart3,  label: "Reportes",       path: "/reportes" },
-      { icon: Bell,       label: "Notificaciones", path: "/notificaciones" },
-    ],
-  },
-  {
-    label: "Administracion", color: "text-slate-500", bar: "bg-slate-500",
-    roles: ["admin", "administracion"] as ERPRole[],
-    items: [
-      { icon: Plug,        label: "Integraciones",  path: "/integraciones" },
-      { icon: ShieldCheck, label: "Auditoria",      path: "/auditoria" },
-      { icon: Store,       label: "Portal Cliente", path: "/portal/login" },
-      { icon: Settings,    label: "Configuracion",  path: "/configuracion" },
-    ],
-  },
-];
+import { useT } from "@/i18n/useT";
 
 export function Sidebar() {
   const { sidebarOpen, toggleSidebar } = useUIStore();
   const { usuario, logout } = useERPAuth();
+  const t = useT();
 
-  // Solo mostrar areas del rol del usuario
+  const TODAS_LAS_AREAS = [
+    {
+      label: t.areaComercial, color: "text-blue-500", bar: "bg-blue-500",
+      roles: ["admin", "comercial"] as ERPRole[],
+      items: [
+        { icon: LayoutDashboard, label: t.dashboard, path: "/",         exact: true },
+        { icon: Target,          label: t.crm,       path: "/crm" },
+        { icon: TrendingUp,      label: t.ventas,    path: "/ventas" },
+      ],
+    },
+    {
+      label: t.areaOperativa, color: "text-emerald-500", bar: "bg-emerald-500",
+      roles: ["admin", "operativa"] as ERPRole[],
+      items: [
+        { icon: Warehouse,   label: t.inventario, path: "/inventario" },
+        { icon: Truck,       label: t.logistica,  path: "/logistica" },
+        { icon: ShoppingBag, label: t.compras,    path: "/compras" },
+      ],
+    },
+    {
+      label: t.areaEmpresarial, color: "text-violet-500", bar: "bg-violet-500",
+      roles: ["admin", "empresarial"] as ERPRole[],
+      items: [
+        { icon: Star,       label: t.calidad,        path: "/calidad" },
+        { icon: DollarSign, label: t.finanzas,       path: "/finanzas" },
+        { icon: FolderOpen, label: t.documentos,     path: "/documentos" },
+        { icon: BarChart3,  label: t.reportes,       path: "/reportes" },
+        { icon: Bell,       label: t.notificaciones, path: "/notificaciones" },
+      ],
+    },
+    {
+      label: t.areaAdministracion, color: "text-slate-500", bar: "bg-slate-500",
+      roles: ["admin", "administracion"] as ERPRole[],
+      items: [
+        { icon: Plug,        label: t.integraciones,  path: "/integraciones" },
+        { icon: ShieldCheck, label: t.auditoria,      path: "/auditoria" },
+        { icon: Store,       label: t.portalCliente,  path: "/portal/login" },
+        { icon: Settings,    label: t.configuracion,  path: "/configuracion" },
+      ],
+    },
+  ];
+
   const areasVisibles = usuario
     ? TODAS_LAS_AREAS.filter(area => area.roles.includes(usuario.rol))
     : TODAS_LAS_AREAS;
 
-  // Para usuarios no-admin: agregar Dashboard al inicio del primer area
   const areasConDashboard = usuario?.rol === "admin"
     ? areasVisibles
     : areasVisibles.map((area, i) => ({
         ...area,
         items: i === 0
-          ? [{ icon: LayoutDashboard, label: "Dashboard", path: "/", exact: true }, ...area.items.filter(it => it.path !== "/")]
+          ? [{ icon: LayoutDashboard, label: t.dashboard, path: "/", exact: true }, ...area.items.filter(it => it.path !== "/")]
           : area.items.filter(it => it.path !== "/"),
       }));
 
@@ -71,7 +71,6 @@ export function Sidebar() {
       "fixed inset-y-0 left-0 z-50 flex flex-col bg-[#0f172a] text-slate-400 transition-all duration-300 border-r border-slate-800 shadow-2xl",
       sidebarOpen ? "w-64" : "w-20"
     )}>
-      {/* Logo */}
       <div className="flex h-20 items-center px-6 border-b border-slate-800/50 shrink-0">
         <div className={cn("flex items-center gap-3 overflow-hidden transition-all duration-300", !sidebarOpen && "justify-center w-full")}>
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 text-white font-bold shadow-lg shadow-blue-500/20 text-xs tracking-tight">GEA</div>
@@ -84,7 +83,6 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Navegacion */}
       <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1 custom-scrollbar">
         {areasConDashboard.map((area) => (
           <div key={area.label}>
@@ -118,13 +116,12 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Logout + Toggle */}
       <div className="p-4 border-t border-slate-800/50 shrink-0 space-y-2">
         {usuario && (
           <button onClick={logout}
             className="flex w-full items-center justify-center gap-2 rounded-xl h-10 bg-red-900/20 hover:bg-red-900/40 text-red-400 hover:text-red-300 transition-all border border-red-900/30 text-xs font-semibold">
             <LogOut className="h-4 w-4" />
-            {sidebarOpen && "Cerrar sesion"}
+            {sidebarOpen && t.cerrarSesion}
           </button>
         )}
         <button onClick={toggleSidebar}
