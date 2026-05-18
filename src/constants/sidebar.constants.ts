@@ -1,0 +1,36 @@
+import {
+  LayoutDashboard,
+  Target,
+  TrendingUp,
+  Warehouse,
+  Truck,
+  ShoppingBag,
+  Star,
+  DollarSign,
+  FolderOpen,
+  BarChart3,
+  Bell,
+  Settings,
+  Store,
+  Plug,
+  ShieldCheck,
+} from "lucide-react";
+import { ROUTES } from "./routes.constants";
+
+export const SIDEBAR_ITEMS = [
+  { icon: LayoutDashboard, label: "Dashboard", path: ROUTES.DASHBOARD },
+  { icon: Target, label: "CRM", path: ROUTES.CRM },
+  { icon: TrendingUp, label: "Ventas", path: ROUTES.SALES },
+  { icon: Warehouse, label: "Inventario", path: ROUTES.INVENTORY },
+  { icon: Truck, label: "Logistica", path: ROUTES.LOGISTICS },
+  { icon: ShoppingBag, label: "Compras", path: ROUTES.PURCHASES },
+  { icon: Star, label: "Calidad", path: ROUTES.QUALITY },
+  { icon: DollarSign, label: "Finanzas", path: ROUTES.FINANCE },
+  { icon: FolderOpen, label: "Documentos", path: ROUTES.DOCUMENTS },
+  { icon: BarChart3, label: "Reportes", path: ROUTES.REPORTS },
+  { icon: Bell, label: "Notificaciones", path: ROUTES.NOTIFICATIONS },
+  { icon: Plug, label: "Integraciones", path: ROUTES.INTEGRACIONES },
+  { icon: ShieldCheck, label: "Auditoria", path: ROUTES.AUDITORIA },
+  { icon: Store, label: "Portal Cliente", path: ROUTES.PORTAL },
+  { icon: Settings, label: "Configuracion", path: ROUTES.SETTINGS },
+] as const;
