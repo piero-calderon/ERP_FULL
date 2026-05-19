@@ -1,5 +1,6 @@
 export enum OrderStatus {
   DRAFT = 'DRAFT',
+  CONFIRMED = 'CONFIRMED',
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
   PROCESSING = 'PROCESSING',
@@ -21,7 +22,8 @@ export enum ProductStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
   DISCONTINUED = 'DISCONTINUED',
-  OUT_OF_STOCK = 'OUT_OF_STOCK'
+  OUT_OF_STOCK = 'OUT_OF_STOCK',
+  LOW_STOCK = 'LOW_STOCK'
 }
 
 export enum ClientStatus {
@@ -37,3 +39,5 @@ export enum MovementType {
   ADJUSTMENT = 'ADJUSTMENT',
   TRANSFER = 'TRANSFER'
 }
+
+

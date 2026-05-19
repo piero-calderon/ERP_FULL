@@ -1,4 +1,8 @@
-﻿import { create } from 'zustand';
+$file = "src\modules\ventas\store\ventas.store.ts"
+$content = Get-Content $file -Raw -Encoding UTF8
+
+$newContent = @'
+import { create } from 'zustand';
 import type {
   Quote, QuoteStatus,
   SalesOrder, SalesOrderStatus,
@@ -69,7 +73,7 @@ function computeStats(
   return { monthlyRevenue, pendingOrders, openQuotes, pendingCommissions, pendingApprovals, invoicedThisMonth, conversionRate };
 }
 
-// Mapea fila de Supabase â†’ SalesOrder
+// Mapea fila de Supabase → SalesOrder
 function mapSupabaseToSalesOrder(row: Record<string, unknown>): SalesOrder {
   const rawLines = (row.pedido_lineas as Record<string, unknown>[] | null) ?? [];
   const lines = rawLines.map((l, i) => ({
@@ -102,7 +106,7 @@ function mapSupabaseToSalesOrder(row: Record<string, unknown>): SalesOrder {
     deliveryTimeFrom: String(row.hora_desde ?? '09:00'),
     deliveryTimeTo: String(row.hora_hasta ?? '17:00'),
     orderType: (row.tipo_pedido as 'puntual' | 'recurrente' | 'urgente') ?? 'puntual',
-    status: (() => { const m: Record<string,string> = { confirmado:'aprobado', en_proceso:'en_preparacion', enviado:'en_ruta', entregado:'entregado', cancelado:'cancelado', borrador:'borrador' }; return (m[String(row.estado)] ?? 'borrador') as SalesOrderStatus; })(),
+    status: (row.estado as SalesOrderStatus) ?? 'borrador',
     lines,
     subtotal: Number(row.subtotal) || 0,
     discount: Number(row.descuento) || 0,
@@ -263,4 +267,7 @@ export const useVentasStore = create<VentasState>((set, get) => ({
     });
   },
 }));
+'@
 
+Set-Content $file -Value $newContent -Encoding UTF8
+Write-Host "✅ ventas.store.ts migrado a Supabase correctamente"
