@@ -1,4 +1,7 @@
-﻿// Pagina de login interno GEA SERVICES ERP con traducciones
+$file = "src\pages\ERPLoginPage.tsx"
+
+$newContent = @'
+// Pagina de login interno GEA SERVICES ERP con traducciones
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2, Mail, Lock, AlertCircle } from "lucide-react";
@@ -133,3 +136,7 @@ export default function ERPLoginPage() {
     </div>
   );
 }
+'@
+
+Set-Content $file -Value $newContent -Encoding UTF8
+Write-Host "✅ Login actualizado — sin acceso rápido, fondo mejorado"
