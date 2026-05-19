@@ -2,6 +2,7 @@
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "ES2020",
+    "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
@@ -13,7 +14,6 @@
     "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "ignoreDeprecations": "5.0",
     "baseUrl": ".",
     "paths": { "@/*": ["./src/*"] }
   },
