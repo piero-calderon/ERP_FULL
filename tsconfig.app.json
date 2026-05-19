@@ -13,9 +13,11 @@
     "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "ignoreDeprecations": "5.0",
+    "ignoreDeprecations": "5.0",`n    "baseUrl": ".",
     "paths": { "@/*": ["./src/*"] }
   },
   "include": ["src"]
 }
+
+
 
